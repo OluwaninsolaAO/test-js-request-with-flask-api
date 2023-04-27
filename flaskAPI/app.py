@@ -3,9 +3,11 @@
 
 from flask import Flask, request, jsonify, make_response, abort, url_for
 from user import User
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 app.url_map.strict_slashes = False
 
 users = ['Abraham', 'Isaac', 'Jacob', 'Joseph']
