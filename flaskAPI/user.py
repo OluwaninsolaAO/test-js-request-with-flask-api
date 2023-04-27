@@ -22,3 +22,8 @@ class User:
     def all(cls):
         """returns a list of User objs"""
         return cls.__users
+
+    @classmethod
+    def all_dict(cls):
+        """returns a list of dictionary reprisentation of users"""
+        return [user.__dict__ for user in cls.__users]

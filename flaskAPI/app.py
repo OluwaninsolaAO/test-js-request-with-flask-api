@@ -9,21 +9,26 @@ app = Flask(__name__)
 app.url_map.strict_slashes = False
 
 users = ['Abraham', 'Isaac', 'Jacob', 'Joseph']
-all_users_dict = [User(user).__dict__ for user in users]
+list(map(lambda user: User(user), users))
+
 
 @app.route('/')
 def home():
     """index page / root url"""
     return "Hello World!"
 
-@app.route('/users', methods=['GET', 'POST'])
-def users():
+@app.route('/users', methods=['GET'])
+def get_users():
     """Returns a simple json representation of User"""
+    return jsonify(User.all_dict())
 
-    if request.method == 'GET':
-        return jsonify(all_users_dict)
-    elif request.method == 'POST':
-        return make_response(jsonify({'OK': 'Success!'}), 201)
+@app.route('/users', methods=['POST'])
+def create_user():
+    """Creates a new user and return the json"""
+    if not request.json or not 'name' in request.json:
+        abort(404)
+    user = User(request.json.get('name', 'Nil'))
+    return jsonify(user.__dict__), 201
 
 
 @app.route('/users/repeat', methods=['POST'])
