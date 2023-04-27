@@ -14,7 +14,7 @@ request
 	.on('data', function (data) {
 		console.log('body: ', data.toString());
 	})
-	.pipe(request.put('http://localhost:5000/users'))
+	.pipe(request.post('http://localhost:5000/users/repeat'))
 	.on('response', function (response) {
 		console.log(response.statusCode);
 		console.log(response.headers['content-type']);
