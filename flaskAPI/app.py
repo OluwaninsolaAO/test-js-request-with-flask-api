@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """simple flask API endpoint"""
 
-from flask import Flask, request, jsonify, make_response, abort
+from flask import Flask, request, jsonify, make_response, abort, url_for
 from user import User
 
 
@@ -12,15 +12,38 @@ users = ['Abraham', 'Isaac', 'Jacob', 'Joseph']
 list(map(lambda user: User(user), users))
 
 
+def get_public_url(user):
+    """Includes a public url for Users"""
+
+    resp = {}
+    for row in user:
+        if row == 'id':
+            resp['uri'] = url_for('get_user', id=user['id'], _external=True)
+        else:
+            resp[row] = user[row]
+    return resp
+
+
 @app.route('/')
 def home():
     """index page / root url"""
     return "Hello World!"
 
+
 @app.route('/users', methods=['GET'])
 def get_users():
+    """Returns a simple json representation of Users"""
+    return jsonify(list(map(get_public_url, User.all_dict())))
+
+
+@app.route('/users/<int:id>', methods=['GET'])
+def get_user(id):
     """Returns a simple json representation of User"""
-    return jsonify(User.all_dict())
+    user = [user for user in User.all_dict() if user['id'] == id]
+    if len(user) == 0:
+        abort(404)
+    return jsonify(get_public_url(user[0]))
+
 
 @app.route('/users', methods=['POST'])
 def create_user():
@@ -44,6 +67,7 @@ def repeat():
 def not_found(error):
     """ Error 404 """
     return make_response(jsonify({'error': 'Not found'}), 404)
+
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
